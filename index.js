@@ -35,17 +35,23 @@ app.post('/createKhana', async (req, res) => {
 
         let shift = "";
 
-        const currentTime = new Date();
-        const currentHour = currentTime.getHours();
-        const currentMinute = currentTime.getMinutes();
-console.log(currentHour)
-        // Determine shift based on current time
+        const nepalTimeOptions = {
+            timeZone: 'Asia/Kathmandu', // Set the time zone to Nepal
+            hour12: false // Use 24-hour format
+        };
+
+        const currentTime = new Date().toLocaleString('en-US', nepalTimeOptions);
+        const currentHour = parseInt(currentTime.split(',')[1].split(':')[0]);
+        const currentMinute = parseInt(currentTime.split(',')[1].split(':')[1]);
+
+        console.log(currentHour);
+
+        // Determine shift based on current time in Nepal
         if (currentHour >= 6 && currentHour < 14) {
             shift = "morning";
         } else {
             shift = "evening";
         }
-
 
         const newKhana = new Khana({ quantity, price, extraItems, shift, otherItems, consumer: userId });
         await newKhana.save();
@@ -60,6 +66,7 @@ console.log(currentHour)
         res.status(500).send(error.message);
     }
 });
+
 
 
 
@@ -222,7 +229,7 @@ app.get("/get/me/:id", async (req, res) => {
             match: { isPaid: false }, // Filter khana where isPaid is false
             populate: { path: "otherItems" },
             populate:{path:"extraItems"} // Populate otherItems in khana
-        });
+        }).sort({createdAt:-1});
 
         res.status(200).json({ user: findUser });
     } catch (error) {
