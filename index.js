@@ -38,7 +38,7 @@ app.post('/createKhana', async (req, res) => {
         const currentTime = new Date();
         const currentHour = currentTime.getHours();
         const currentMinute = currentTime.getMinutes();
-
+console.log(currentHour)
         // Determine shift based on current time
         if (currentHour >= 6 && currentHour < 14) {
             shift = "morning";
@@ -51,6 +51,7 @@ app.post('/createKhana', async (req, res) => {
         await newKhana.save();
 
         const findUser = await User.findById(userId);
+        
         findUser.khana.push(newKhana._id);
         await findUser.save();
 
